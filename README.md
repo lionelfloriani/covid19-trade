@@ -2,7 +2,7 @@
 
 ## Overview
 This is a command-line tool that analyzes the impact of Covid19 on trade as of July 2021. 
-The tool reads data from a TXT file and generates reports based on user input.
+The tool reads data from a .txt file and generates reports based on user input.
 
 ## Usage
 - Clone this repository.
