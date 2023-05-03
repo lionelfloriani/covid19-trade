@@ -7,6 +7,12 @@ public class Messages {
             
             Data analysis commandline tool on how Covid19 has affected trade as of July 2021.
             
+            Main commands :
+            - monthly_average (ma)
+            - monthly_total (mt)
+            - yearly_average (ya)
+            - yearly_total (yt)
+            
             """;
     protected final String INSERT_QUERY = """
             ***
@@ -19,19 +25,19 @@ public class Messages {
             help <command>
             - Display an extended explanation of the <command>.
             
-            monthly_average
+            monthly_average / ma
             - Returns the average trade value of a specified month.
             
-            monthly_total
+            monthly_total / mt
             - Returns the total trade value of a specified month.
             
-            yearly_average
+            yearly_average / ya
             - Returns the average trade value of a specified year.
             
-            yearly_total
+            yearly_total / yt
             - Returns the total trade value of a specified year.
             
-            overview
+            overview / ov
             - Returns a list of available custom parameters for queries.
             
             exit

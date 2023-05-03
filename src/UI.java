@@ -38,40 +38,62 @@ public class UI extends Messages {
         } else {
             switch (query) {
                 case "help" -> System.out.println(MAIN_HELP);
-                case "monthly_average", "monthly_total", "yearly_average", "yearly_total" -> {
+                case "monthly_average", "ma", "monthly_total", "mt", "yearly_average", "ya", "yearly_total", "yt" -> {
                     String year = readYear();
                     switch (query) {
-                        case "monthly_average", "monthly_total" -> {
+                        case "monthly_average", "ma", "monthly_total", "mt" -> {
                             String month = readMonth();
-                            String country = readCountry();
-                            String commodity = readCommodity();
-                            String transport = readTransportMode();
-                            String measurement = readMeasurement();
-
+                            boolean wantsCustomParam = readCustomParam();
+                            String country = "";
+                            String commodity = "";
+                            String transport = "";
+                            String measurement = "";
+                            if (wantsCustomParam) {
+                                country = readCountry();
+                                commodity = readCommodity();
+                                transport = readTransportMode();
+                                measurement = readMeasurement();
+                            } else {
+                                country = "all";
+                                commodity = "all";
+                                transport = "all";
+                                measurement = "\\$";
+                            }
                             switch (query) {
-                                case "monthly_average" -> System.out.println(monthlyAverage(year, month, country, commodity,
+                                case "monthly_average", "ma" -> System.out.println(monthlyAverage(year, month, country, commodity,
                                         transport, measurement));
-                                case "monthly_total" -> System.out.println(monthlyTotal(year, month, country, commodity,
+                                case "monthly_total", "mt" -> System.out.println(monthlyTotal(year, month, country, commodity,
                                         transport, measurement));
                             }
 
                         }
-                        case "yearly_average", "yearly_total" -> {
-                            String country = readCountry();
-                            String commodity = readCommodity();
-                            String transport = readTransportMode();
-                            String measurement = readMeasurement();
-
+                        case "yearly_average", "ya", "yearly_total", "yt" -> {
+                            boolean wantsCustomParam = readCustomParam();
+                            String country = "";
+                            String commodity = "";
+                            String transport = "";
+                            String measurement = "";
+                            if (wantsCustomParam) {
+                                country = readCountry();
+                                commodity = readCommodity();
+                                transport = readTransportMode();
+                                measurement = readMeasurement();
+                            } else {
+                                country = "all";
+                                commodity = "all";
+                                transport = "all";
+                                measurement = "\\$";
+                            }
                             switch (query) {
-                                case "yearly_average" -> System.out.println(yearlyAverage(year, country, commodity, transport,
+                                case "yearly_average", "ya" -> System.out.println(yearlyAverage(year, country, commodity, transport,
                                         measurement));
-                                case "yearly_total" -> System.out.println(yearlyTotal(year, country, commodity, transport,
+                                case "yearly_total", "yt" -> System.out.println(yearlyTotal(year, country, commodity, transport,
                                         measurement));
                             }
                         }
                     }
                 }
-                case "overview" -> {
+                case "overview", "ov" -> {
                     getOverview();
                 }
                 default -> printErrorCommand();
@@ -103,20 +125,35 @@ public class UI extends Messages {
                 """, helpCommand[1], helpCommand[1], helpCommand[1]);
     }
 
+    private boolean readCustomParam() {
+        String input = "";
+        boolean wantsCustomParam = false;
+        while (true) {
+            System.out.println("Do you want to use custom parameters? (Y/N)");
+            System.out.print("\033[1m>\033[0m ");
+            input = scanner.nextLine();
+            if (input.toLowerCase().matches("y")) {
+                wantsCustomParam = true;
+                break;
+            } else if (input.toLowerCase().matches("n")) {
+                break;
+            }
+            System.out.printf("\"%s\" is not valid.%n", input);
+            System.out.println("...");
+        }
+        return wantsCustomParam;
+    }
     private String readMonth() {
-        boolean monthIsCorrect = false;
         String month = "";
-        while (!monthIsCorrect) {
+        while (true) {
             System.out.println("Month?");
             System.out.print("\033[1m>\033[0m ");
             month = scanner.nextLine().toLowerCase();
             if (month.matches("^(0[1-9]|1[0-2])$")) {
-                monthIsCorrect = true;
                 break;
             }
             if (month.matches("^(january|february|march|april|" +
                     "mai|june|july|august|september|october|november|december)$")) {
-                monthIsCorrect = true;
                 switch (month) {
                     case "january" -> month = "01";
                     case "february" -> month = "02";
@@ -135,7 +172,6 @@ public class UI extends Messages {
             }
             if (month.matches("^(jan|feb|mar|apr|" +
                     "mai|jun|jul|aug|sep|oct|nov|dec)$")) {
-                monthIsCorrect = true;
                 switch (month) {
                     case "jan" -> month = "01";
                     case "feb" -> month = "02";
@@ -160,14 +196,12 @@ public class UI extends Messages {
     }
 
     private String readYear() {
-        boolean yearIsCorrect = false;
         String year = "";
-        while (!yearIsCorrect) {
+        while (true) {
             System.out.println("Year?");
             System.out.print("\033[1m>\033[0m ");
             year = scanner.nextLine().toLowerCase();
             if (year.matches("^(201[5-9]|202[0-2])$")) {
-                yearIsCorrect = true;
                 break;
             }
             System.out.printf("'%s' is out of range.%n", year);
@@ -178,66 +212,102 @@ public class UI extends Messages {
     }
 
     private String readCountry() {
-        boolean countryIsCorrect = false;
         String country = "";
-        while (!countryIsCorrect) {
-            System.out.println("Country? (press '\033[1mENTER\033[0m' for default value.)");
+        while (true) {
+            System.out.println("Country?");
+            Object[] countryValues = ReadCsv.getUniqueValuesByTag().get("country").toArray();
+            System.out.println("-".repeat(25));
+            for (int i = 0; i < countryValues.length; i++) {
+                System.out.printf("%d) %s%n", i + 1, countryValues[i]);
+            }
+            System.out.println("-".repeat(25));
             System.out.print("\033[1m>\033[0m ");
             country = scanner.nextLine().toLowerCase();
             if (country.matches("^(australia|european union|japan|all|china|east asia|" +
                     "united states|total|united kingdom)$")) {
-                countryIsCorrect = true;
+                break;
+            } else if (country.matches("[1-9]")) {
+                switch (country) {
+                    case "1" -> country = "all";
+                    case "2" -> country = "australia";
+                    case "3" -> country = "china";
+                    case "4" -> country = "east asia";
+                    case "5" -> country = "european union";
+                    case "6" -> country = "japan";
+                    case "7" -> country = "total";
+                    case "8" -> country = "united kingdom";
+                    case "9" -> country = "united states";
+                }
                 break;
             } else if (country.isEmpty()) {
                 country = "all";
-                countryIsCorrect = true;
                 break;
             }
             System.out.println("Incorrect value.");
-            System.out.println();
-            System.out.println("Available values :");
-            System.out.println(COUNTRY_VALUE);
         }
         return country;
     }
 
     private String readCommodity() {
-        boolean commodityIsCorrect = false;
         String commodity = "";
-        while (!commodityIsCorrect) {
-            System.out.println("Commodity? (press '\033[1mENTER\033[0m' for default value.)");
+        while (true) {
+            System.out.println("Commodity?");
+            Object[] commodityValues = ReadCsv.getUniqueValuesByTag().get("commodity").toArray();
+            System.out.println("-".repeat(25));
+            for (int i = 0; i < commodityValues.length; i++) {
+                System.out.printf("%d) %s%n", i + 1, commodityValues[i]);
+            }
+            System.out.println("-".repeat(25));
             System.out.print("\033[1m>\033[0m ");
             commodity = scanner.nextLine().toLowerCase();
             if (commodity.matches("^(electrical machinery|fish, crustaceans, molluscs|fruit|" +
                     "logs, wood, wood articles|milk powder, butter, cheese|non-food manufactured goods|all|mechanical machinery|meat)$")) {
-                commodityIsCorrect = true;
+                break;
+            } else if (commodity.matches("[1-9]")) {
+                switch (commodity) {
+                    case "1" -> commodity = "all";
+                    case "2" -> commodity = "electrical machinery";
+                    case "3" -> commodity = "fish, crustaceans, molluscs";
+                    case "4" -> commodity = "fruit";
+                    case "5" -> commodity = "logs, wood, wood articles";
+                    case "6" -> commodity = "meat";
+                    case "7" -> commodity = "mechanical machinery";
+                    case "8" -> commodity = "milk powder, butter, cheese";
+                    case "9" -> commodity = "non-food manufactured goods";
+                }
                 break;
             } else if (commodity.isEmpty()) {
                 commodity = "all";
-                commodityIsCorrect = true;
                 break;
             }
             System.out.println("Incorrect value.");
-            System.out.println();
-            System.out.println("Available values :");
-            System.out.println(COMMODITY_VALUE);
         }
         return commodity;
     }
 
     private String readTransportMode() {
-        boolean transportIsCorrect = false;
         String transport = "";
-        while (!transportIsCorrect) {
-            System.out.println("Transport Mode? (press '\033[1mENTER\033[0m' for default value.)");
+        while (true) {
+            System.out.println("Transport Mode?");
+            Object[] transportValues = ReadCsv.getUniqueValuesByTag().get("transport_mode").toArray();
+            System.out.println("-".repeat(25));
+            for (int i = 0; i < transportValues.length; i++) {
+                System.out.printf("%d) %s%n", i + 1, transportValues[i]);
+            }
+            System.out.println("-".repeat(25));
             System.out.print("\033[1m>\033[0m ");
             transport = scanner.nextLine().toLowerCase();
             if (transport.matches("^(air|all|sea)$")) {
-                transportIsCorrect = true;
+                break;
+            } else if (transport.matches("[1-3]")) {
+                switch (transport) {
+                    case "1" -> transport = "air";
+                    case "2" -> transport = "all";
+                    case "3" -> transport = "sea";
+                }
                 break;
             } else if (transport.isEmpty()) {
                 transport = "all";
-                transportIsCorrect = true;
                 break;
             }
             System.out.println("Incorrect value.");
@@ -249,28 +319,33 @@ public class UI extends Messages {
     }
 
     private String readMeasurement() {
-        boolean measurementIsCorrect = false;
         String measurement = "";
-        while (!measurementIsCorrect) {
-            System.out.println("Measurement? (press '\033[1mENTER\033[0m' for default value.)");
+        while (true) {
+            System.out.println("Measurement?");
+            Object[] measurementValues = ReadCsv.getUniqueValuesByTag().get("measure").toArray();
+            System.out.println("-".repeat(25));
+            for (int i = 0; i < measurementValues.length; i++) {
+                System.out.printf("%d) %s%n", i + 1, measurementValues[i]);
+            }
+            System.out.println("-".repeat(25));
             System.out.print("\033[1m>\033[0m ");
             measurement = scanner.nextLine();
             if (measurement.equals("$")) {
                 measurement = "\\$";
-                measurementIsCorrect = true;
+                break;
+            } else if (measurement.matches("[1-2]")) {
+                switch (measurement) {
+                    case "1" -> measurement = "\\$";
+                    case "2" -> measurement = "tonnes";
+                }
                 break;
             } else if (measurement.equals("tonnes")) {
-                measurementIsCorrect = true;
                 break;
             } else if (measurement.isEmpty()) {
                 measurement = "\\$";
-                measurementIsCorrect = true;
                 break;
             }
             System.out.println("Incorrect value.");
-            System.out.println();
-            System.out.println("Available values :");
-            System.out.println(MEASUREMENT_VALUE);
         }
         return measurement;
     }
