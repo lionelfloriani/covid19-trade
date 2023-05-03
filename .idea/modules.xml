@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/EffectOfCovid19OnTrade.iml" filepath="$PROJECT_DIR$/EffectOfCovid19OnTrade.iml" />
+      <module fileurl="file://$PROJECT_DIR$/covid19-trade.iml" filepath="$PROJECT_DIR$/covid19-trade.iml" />
     </modules>
   </component>
 </project>

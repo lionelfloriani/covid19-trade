@@ -3,7 +3,7 @@ import java.io.FileNotFoundException;
 import java.util.*;
 
 public class ReadCsv {
-    private File file = new File("/Users/lionelfloriani/Code/Java/EffectOfCovid19OnTrade/data/covid.txt");
+    private File file = new File("/Users/lionelfloriani/Code/Java/covid19-trade/data/covid.txt");
     private Scanner scanner = new Scanner(file);
     private static List<Line> data = new ArrayList<>();
     private static Map<String, Set<String>> uniqueValuesByTag = new HashMap<>();
